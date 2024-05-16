@@ -1,0 +1,95 @@
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>끝말잇기</title>
+</head>
+
+<body>
+  <div><span id="order">1</span>번째 참가자</div>
+  <div>제시어 : <span id="word"></span></div>
+  <input type="text">
+  <button class="target">입력</button>
+  <!-- <button class="btn2">버튼2</button>
+  <button class="btn3">버튼3</button> -->
+
+  <script>
+    /* 프롬프트창 */
+    const number = parseInt(prompt('몇 명이 참가하나요?'), 10); //parseInt : 문자열에서 정수 반환, prompt : 사용자가 입력할 수 있는 프롬프트 챵
+    alert(number); //alert 경고창(알림창)
+    const yesOrNo = confirm('맞나요?'); //confirm : 확인/취소 선택지
+    
+    /* 선택자 */
+    //const $button = document.querySelector('button'); //첫번째 button 선택
+    //const $$button = document.querySelectorAll('button'); //button 모두 선택
+    //document.querySelector('#order'); //id가 order인 태그
+    //document.querySelector('.target'); //class가 target인 태그
+    //document.querySelectorAll('button.btn'); //class가 btn인 button 태그
+    //document.querySelector('div span'); //div 자식 span 태그
+
+    /* 함수이벤트 */
+    //방법1
+    //document.querySelector('input').addEventListener('input', () => {
+    //  console.log('글자입력', event.target.value); // event.target.value : 입력되고 있는 텍스트를 보여줌
+    //});
+
+    //방법2
+    //const onClick = () => {
+    //  console.log('버튼클릭');
+    //};
+    //document.querySelector('button').addEventListener('click', onClick); //onClick을 콜백함수라고 한다. click하면 따라오는 이벤트라서
+
+    /* 첫 번째 사람인지 판단하기 */
+    let word; // 제시어
+    let newWord; // 새로 입력한 단어
+    const $word = document.querySelector('#word');
+    const $input = document.querySelector('input');
+    const $button = document.querySelector('button'); 
+    const $order = document.querySelector('#order');
+    
+    const onClickButton = () => {
+      if(!word) { //제시어가 비어있는가?
+        // 제시어가 비어 있다
+        word = newWord; // 입력 단어가 제시어가 된다
+        $word.textContent = word; // 화면에 표시
+        //다른 사람에게 순서를 넘긴다
+        const order = Number($order.textContent); //현재 순서
+        if(order + 1 > number) { // 현재 순서에 1을 더한 값이 참가자 수보다 큰가?
+          $order.textContent = 1 //1번으로 이동
+        } else {
+          $order.textContent = order + 1 // 다음 순서로 이동
+        };
+        $input.value=''; // 입력 후 비워짐
+        $input.focus() // 입력필드 포커스
+      } else {
+        // 비어 있지 않다
+        if(word[word.length - 1] === newWord[0]) { // 입력 단어가 올바른가? (제시어의 마지막 글자와 새 단어의 첫 글자가 같은지 비교)
+          word = newWord; // 입력 단어가 제시어가 된다
+          $word.textContent = word; // 화면에 표시
+          //다른 사람에게 순서를 넘긴다
+          const order = Number($order.textContent); //현재 순서
+          if(order + 1 > number) { // 현재 순서에 1을 더한 값이 참가자 수보다 큰가?
+            $order.textContent = 1 //1번으로 이동
+          } else {
+            $order.textContent = order + 1 // 다음 순서로 이동
+          };
+        } else {
+          alert('땡!!')
+        };
+        $input.value=''; // 입력 후 비워짐
+        $input.focus() // 입력필드 포커스
+      };
+    };
+
+    const onInput = (event) => {
+      newWord = event.target.value; // 글자를 입력할 때 마다 새로운 입력 단어로 저장
+    };
+
+    $button.addEventListener('click', onClickButton);
+    $input.addEventListener('input', onInput);
+
+
+
+  </script>
+</body>
+</html>
