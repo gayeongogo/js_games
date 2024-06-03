@@ -1,0 +1,91 @@
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>숫자야구</title>
+</head>
+<body>
+  <h2>숫자야구</h2>
+  <form id="form">
+    <input type="text" id="input">
+    <button>확인</button>
+  </form>
+  <div id="logs"></div>
+  <script>
+    const $input = document.querySelector('#input');
+    const $form = document.querySelector('#form');
+    const $logs = document.querySelector('#logs');
+
+    const numbers = []; 
+    for (let n = 0; n < 9; n += 1) { // [1, 2, 3, 4, 5, 6, 7, 8, 9]
+      numbers.push(n + 1);
+    }
+
+    const answer = [];
+    for (let n = 0; n < 4; n += 1) {
+      const index = Math.floor(Math.random() * (numbers.length - n)); // 0~8 정수 (배열 인덱스)
+      answer.push(numbers[index]); //answer 배열에 뽑은 번호 넣기
+      numbers.splice(index, 1); // 뽑은 번호를 numbers 배열에서 없애기
+    }
+    console.log(answer);
+
+    const tries = [];
+    function checkInput(input) {
+      // 검사하는 함수
+      if (input.length !== 4) {
+        return alert('네 자리 숫자를 입력해주세요.');
+      }
+      if (new Set(input).size !==4) {
+        return alert('숫자가 중복되지 않게 입력해주세요.');
+      }
+      if (tries.includes(input)) {
+        return alert('이미 시도한 값입니다.');
+      }
+      return true;
+    }
+
+    let out = 0;
+    $form.addEventListener('submit', () => {
+      event.preventDefault(); // form 기본 이벤트 막기
+      const value = $input.value; // 입력 값 저장
+      $input.value = ''; // 다음 값 입력을 위한 초기화
+      // 홈런 검사
+      if (!checkInput(value)) {
+        return;
+      }
+      if (answer.join('') === value) {
+        $logs.textContent = '홈런!';
+        return;
+      }
+      if (tries.length >= 9) { // 시도 횟수가 9번 이상일 때
+        $logs.appendChild(document.createTextNode(`패배! 정답은 ${answer.join('')}`));
+        return;
+      }
+      let strike = 0;
+      let ball = 0;
+      //몇 볼 몇 스트라이크
+      for (let i = 0; i < answer.length; i++) { // answer 배열을 돌면서 숫자가 일치하는지 검사
+        const index = value.indexOf(answer[i]);
+        if (index > -1) { // 일치하는 숫자 발견
+          if (index === i) { // 자릿수까지 같을 때
+            strike += 1;
+          } else { // 숫자만 같을 때
+            ball += 1;
+          }
+        }
+      }
+      if (strike == 0 && ball == 0) {
+        out++;
+        $logs.append(`${value}: ${out}아웃!`, document.createElement('br'));
+      } else {
+        $logs.append(`${value}: ${strike} 스트라이크 ${ball} 볼`, document.createElement('br'));
+      }
+      if (out === 3) {
+        $logs.appendChild(document.createTextNode(`패배! 정답은 ${answer.join('')}`));
+        return;
+      }
+      tries.push(value); // 시도한 숫자 저장
+    })
+  </script>
+</body>
+</html>
