@@ -1,0 +1,106 @@
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>로또추첨기</title>
+  <style>
+    .ball {
+      display: inline-block;
+      border: 1px solid black;
+      border-radius: 20px;
+      width: 40px;
+      height: 40px;
+      line-height: 40px;
+      font-size: 20px;
+      text-align: center;
+      margin-right: 20px;
+  }
+  input {
+    width: 250px;
+  }
+  </style>
+</head>
+<body>
+  <form id="form">
+    <input name="input" placeholder="숫자 6개를 쉼표로 구분해 입력하세요." />
+    <button>추첨</button>
+  </form>
+  <div id="result">당첨 숫자: </div>
+  <div id="bonus">보너스 숫자: </div>
+  <script>
+    const $form = document.querySelector('#form');
+    const $result = document.querySelector('#result');
+    const $bonus = document.querySelector('#bonus');
+
+    const setTimeoutPromise = (ms) => new Promise((resolve, reject) => {
+      setTimeout(resolve, ms)
+    })
+    $form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      /* 입력 값 받기 */
+      const string = event.target.input.value;
+      if (!string.trim()) { //trim : 띄어쓰기 없앰 (혹시나 있는 경우에 지워줌) //입력 값이 없음
+        return alert('숫자를 입력하세요');
+      } 
+      const myNumbers = string.split(',').map((v) => parseInt(v.trim())); //split을 이용해 콤마로 구분된 배열로 만들고 숫자로 표시
+      if (myNumbers.length !== 6) {
+        return alert('숫자를 6개 입력하세요.');
+      }
+      if (new Set(myNumbers).size !== 6) { // Set은 myNumber 배열에서 중복이 있을 때 그 값을 하나로 만듬, 중복이 있으면 배열이 6개가 안되니 오류 표시
+        return alert('중복된 숫자를 입력했습니다.');
+      }
+      if (myNumbers.find((v) => v > 45 || v < 1)) {
+        return alert('1부터 45 사이의 수를 입력하세요.');
+      }
+      /* 당첨 숫자, 보너스 숫자 랜덤 표시 */
+      const candidate = Array(45).fill().map((v, i) => i + 1);
+      const shuffle = [];
+      while (candidate.length) {
+        const random = Math.floor(Math.random() * candidate.length); // 무작위 인덱스 뽑기
+        const spliceArray = candidate.splice(random, 1); // 뽑은 값은 배열에 들어 있음
+        const value = spliceArray[0]; // 배열에 들어 있는 값을 꺼내어
+        shuffle.push(value); // shuffle 배열에 넣기
+      }
+      console.log(shuffle);
+      const winBalls = shuffle.slice(0, 6).sort((a, b) => a - b); // 당첨 숫자
+      const bonus = shuffle[6]; // 보너스 숫자
+      console.log(winBalls, bonus);
+      function drawBall(value, $target) {
+        const $ball = document.createElement('div'); // div 만들기
+        $ball.className = 'ball'; // class를 ball로 지정
+        $ball.textContent = value;
+        $target.appendChild($ball);
+      }
+      for (let i = 0; i < winBalls.length; i++) {
+        await setTimeoutPromise(1000);
+        drawBall(winBalls[i], $result);
+      }
+      await setTimeoutPromise(1000);
+      drawBall(bonus, $bonus);
+      /* 몇 등인지 표시 */
+      let count = 0; // 맞힌 숫자
+      await setTimeoutPromise(500); // 잠깐 시간 주기
+      myNumbers.forEach((my) => { // 입력받은 myNumbers 배열 돌리기
+        if (winBalls.includes(my)) { // winBalls에 포함된 숫자가 있는지 검사
+          count++;
+        }
+      })
+      if (count === 6) {
+        alert('1등! 여기서 1등을 하시다니...😂');
+      } else if (count === 5) {
+        if (myNumbers.includes(bonus)) { // 보너스 숫자가 있는가?
+          alert('2등! 보너스 숫자 당첨!!😆');
+        } else {
+          alert('3등!😁');
+        }
+      } else if (count === 4) {
+        alert('4등! 5만원 당첨😏');
+      } else if (count === 3) {
+        alert('5등! 5천원 당첨👍');
+      } else {
+        alert('꽝이라네🙃');
+      }
+    })
+  </script>
+</body>
+</html>
